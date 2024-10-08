@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_08_124719) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_08_163656) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -49,6 +49,91 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_08_124719) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "documents", force: :cascade do |t|
+    t.integer "folder_id"
+    t.string "name", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["folder_id"], name: "index_documents_on_folder_id"
+  end
+
+  create_table "documents_reviews", id: false, force: :cascade do |t|
+    t.integer "review_id", null: false
+    t.integer "document_id", null: false
+  end
+
+  create_table "folders", force: :cascade do |t|
+    t.integer "project_id"
+    t.string "name", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_folders_on_project_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.string "name", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name", default: "", null: false
+    t.string "email", default: "", null: false
+    t.boolean "admin", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "workflows_categories", force: :cascade do |t|
+    t.string "container_type"
+    t.integer "container_id"
+    t.string "name", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["container_type", "container_id"], name: "index_workflows_categories_on_container"
+  end
+
+  create_table "workflows_stages", force: :cascade do |t|
+    t.integer "template_id"
+    t.string "name", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "position", default: 1, null: false
+    t.integer "default_deadline", default: 1, null: false
+    t.integer "completion_type", default: 0, null: false
+    t.integer "stage_type", default: 1, null: false
+    t.string "colour", default: "#aaaaaa", null: false
+    t.string "form_template_type"
+    t.integer "form_template_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_template_type", "form_template_id"], name: "index_workflows_stages_on_form_template"
+    t.index ["template_id"], name: "index_workflows_stages_on_template_id"
+  end
+
+  create_table "workflows_templates", force: :cascade do |t|
+    t.integer "category_id"
+    t.string "name", default: "", null: false
+    t.string "default_owner_type"
+    t.integer "default_owner_id"
+    t.integer "default_deadline", default: 1, null: false
+    t.integer "position", default: 1, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_workflows_templates_on_category_id"
+    t.index ["default_owner_type", "default_owner_id"], name: "index_workflows_templates_on_default_owner"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "documents", "folders"
+  add_foreign_key "folders", "projects"
+  add_foreign_key "workflows_stages", "workflows_templates", column: "template_id"
+  add_foreign_key "workflows_templates", "workflows_categories", column: "category_id"
 end
