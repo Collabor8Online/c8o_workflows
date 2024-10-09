@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_08_163656) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_09_204651) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -47,6 +47,32 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_08_163656) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "automations_actions", force: :cascade do |t|
+    t.integer "automation_id", null: false
+    t.integer "position", null: false
+    t.string "name", default: "", null: false
+    t.string "handler_class_name", default: "", null: false
+    t.text "configuration_data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["automation_id"], name: "index_automations_actions_on_automation_id"
+  end
+
+  create_table "automations_automations", force: :cascade do |t|
+    t.string "container_type"
+    t.integer "container_id"
+    t.string "type"
+    t.string "name", default: "", null: false
+    t.integer "status", default: 0, null: false
+    t.text "configuration_data"
+    t.string "configuration_class_name", default: "", null: false
+    t.string "before_trigger_class_name", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["container_id", "container_type", "status", "type"], name: "idx_on_container_id_container_type_status_type_88c50d46bb"
+    t.index ["container_type", "container_id"], name: "index_automations_automations_on_container"
   end
 
   create_table "documents", force: :cascade do |t|
@@ -99,12 +125,34 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_08_163656) do
     t.index ["container_type", "container_id"], name: "index_workflows_categories_on_container"
   end
 
+  create_table "workflows_default_assignments", force: :cascade do |t|
+    t.integer "stage_id"
+    t.string "user_type"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stage_id"], name: "index_workflows_default_assignments_on_stage_id"
+    t.index ["user_type", "user_id"], name: "index_workflows_default_assignments_on_user"
+  end
+
+  create_table "workflows_options", force: :cascade do |t|
+    t.integer "stage_id"
+    t.string "name", default: "", null: false
+    t.string "colour", default: "#888888", null: false
+    t.integer "destination_stage_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["destination_stage_id"], name: "index_workflows_options_on_destination_stage_id"
+    t.index ["stage_id"], name: "index_workflows_options_on_stage_id"
+  end
+
   create_table "workflows_stages", force: :cascade do |t|
     t.integer "template_id"
     t.string "name", default: "", null: false
     t.integer "status", default: 0, null: false
     t.integer "position", default: 1, null: false
     t.integer "default_deadline", default: 1, null: false
+    t.integer "deadline_type", default: 0, null: false
     t.integer "completion_type", default: 0, null: false
     t.integer "stage_type", default: 1, null: false
     t.string "colour", default: "#aaaaaa", null: false
@@ -132,8 +180,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_08_163656) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "automations_actions", "automations_automations", column: "automation_id"
   add_foreign_key "documents", "folders"
   add_foreign_key "folders", "projects"
+  add_foreign_key "workflows_default_assignments", "workflows_stages", column: "stage_id"
+  add_foreign_key "workflows_options", "workflows_stages", column: "destination_stage_id"
+  add_foreign_key "workflows_options", "workflows_stages", column: "stage_id"
   add_foreign_key "workflows_stages", "workflows_templates", column: "template_id"
   add_foreign_key "workflows_templates", "workflows_categories", column: "category_id"
 end

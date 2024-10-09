@@ -17,13 +17,13 @@ initial_stage:
       description: Start the review process
       colour: "#315C2B"
       destination_stage: In review
-      automation:
-        name: Start review
-        actions:
-          - name: Move to Review folder
-            class_name: MoveDocumentsToFolder
-            configuration:
-              folder_name: In review
+      automations:
+        - name: Start review
+          actions:
+            - name: Move to Review folder
+              class_name: MoveDocumentsToFolder
+              configuration:
+                folder_name: In review
 in_progress_stages:
   - name: In review
     assignment_instructions: Please review these documents
