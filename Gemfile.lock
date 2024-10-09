@@ -1,8 +1,17 @@
 PATH
+  remote: ../c8o_automations
+  specs:
+    c8o_automations (0.1.0)
+      acts_as_list (>= 1.1.0)
+      rails (>= 7.1.3.4)
+      standard-procedure-plumbing
+
+PATH
   remote: .
   specs:
     c8o_workflows (0.1.0)
       acts_as_list
+      c8o_automations
       rails (>= 7.1.3)
       standard-procedure-plumbing
 
@@ -331,6 +340,7 @@ PLATFORMS
   arm64-darwin
 
 DEPENDENCIES
+  c8o_automations!
   c8o_workflows!
   guard
   guard-bundler

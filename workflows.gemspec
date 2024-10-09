@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", ">= 7.1.3"
   spec.add_dependency "acts_as_list"
   spec.add_dependency "standard-procedure-plumbing"
+  spec.add_dependency "c8o_automations"
 end
