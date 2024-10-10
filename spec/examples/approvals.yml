@@ -1,0 +1,64 @@
+name: Approval
+description: Simple document approval process
+default_owner: bob@example.com
+default_deadline: 7
+initial_stage:
+  name: Awaiting review
+  description: These documents are awaiting review
+  assignment_instructions: Please prepare these documents for review
+  default_assignments:
+    - chris@example.com
+  default_deadline: 1
+  deadline_type: days_after
+  completion_type: completed_by_any
+  colour: "#181F1C"
+  options:
+    - name: Start review
+      description: Start the review process
+      colour: "#315C2B"
+      destination_stage: In review
+      automations:
+        - name: Start review
+          actions:
+            - name: Move to Review folder
+              class_name: MoveDocumentsToFolder
+              configuration:
+                folder_name: In review
+in_progress_stages:
+  - name: In review
+    assignment_instructions: Please review these documents
+    default_assignments:
+      - bob@example.com
+      - chris@example.com
+    default_deadline: 2
+    completion_type: completed_by_all
+    colour: "#274029"
+    options:
+      - name: Approve
+        description: Approve these documents
+        colour: "#60712F"
+        destination_stage: Approved
+        automations:
+          - name: Approve documents
+            actions:
+              - name: Move to Approved folder
+                class_name: MoveDocumentsToFolder
+                configuration:
+                  folder_name: Approved
+      - name: Reject
+        description: Reject these documents
+        colour: "#E88873"
+        destination_stage: Rejected
+        automations:
+          - name: Reject documents
+            actions:
+              - name: Move to Rejected folder
+                class_name: MoveDocumentsToFolder
+                configuration:
+                  folder_name: Rejected
+completed_stages:
+  - name: Approved
+    colour: "#60712F"
+cancelled_stages:
+  - name: Rejected
+    colour: "#E88873"
