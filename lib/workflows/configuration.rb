@@ -1,8 +1,4 @@
 module Workflows
-  def self.configuration
-    @configuration ||= Configuration.start
-  end
-
   class Configuration
     include Plumbing::Actor
 
@@ -14,4 +10,8 @@ module Workflows
 
     attr_reader :find_user
   end
+
+  def self.configuration = @configuration
+
+  @configuration = Configuration.start
 end
