@@ -49,7 +49,7 @@ RSpec.describe Workflows::Category do
   end
 
   describe "#create_template" do
-    it "creates a new template from a configuration"
+    it "creates a new template"
     it "publishes a 'workflows/template_created' event"
   end
 
