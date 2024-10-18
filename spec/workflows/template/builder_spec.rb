@@ -20,9 +20,7 @@ RSpec.describe Workflows::Template::Builder do
 
   context "when no find_user routine is set" do
     it "fails" do
-      expect do
-        builder.call(configuration: configuration, category: category)
-      end.to raise_error(Plumbing::PreConditionError)
+      expect { builder.call(configuration: configuration, category: category) }.to raise_error(Plumbing::PreConditionError)
     end
   end
 

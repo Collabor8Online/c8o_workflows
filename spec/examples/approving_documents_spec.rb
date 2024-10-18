@@ -13,7 +13,7 @@ RSpec.describe "approving documents" do
   let!(:dave) { User.create! name: "Dave", email: "dave@example.com", admin: false }
 
   let(:category) { Workflows::Category.create! name: "Document management", container: project }
-  let(:template) { Workflows::Template::Builder.new.call configuration: configuration, container: project }
+  let(:template) { Workflows::Template::Builder.new.call category: category, configuration: configuration }
   let(:configuration) { File.read(File.join(__dir__, "approvals.yml")) }
 
   before do
@@ -22,21 +22,22 @@ RSpec.describe "approving documents" do
     end
   end
 
-  it "assigns the task with default values"
-  #     first_document = Document.create! name: "first.txt", folder: uploads_folder
-  #     second_document = Document.create! name: "second.txt", folder: uploads_folder
-  #     review = Review.create! documents: [first_document, second_document]
-  #
-  #     task = review.start_workflow template
-  #
-  #     expect(task.refers_to).to eq review
-  #     expect(review.workflow_tasks).to include(task)
-  #
-  #     expect(task.title).to eq "Approval"
-  #     expect(task.due_on).to eq(Date.today + 7)
-  #     expect(task.description.to_plain_text).to eq "Simple document approval process"
-  #     expect(task.current_status.name).to eq "Awaiting review"
-  #     expect(task.assigned_to).to include(chris)
+  it "assigns the task with default values" do
+    first_document = Document.create! name: "first.txt", folder: uploads_folder
+    second_document = Document.create! name: "second.txt", folder: uploads_folder
+
+    task = uploads_folder.start_workflow template, items: [first_document, second_document]
+
+    expect(uploads_folder.workflow_tasks).to include task
+    expect(task.items).to include first_document
+    expect(task.items).to include second_document
+
+    expect(task.title).to eq "Approval"
+    expect(task.due_on).to eq(Date.today + 7)
+    expect(task.description.to_plain_text).to eq "Simple document approval process"
+    expect(task.current_status.name).to eq "Awaiting review"
+    expect(task.assigned_to).to include(chris)
+  end
 
   it "assigns the task with overridden values"
   #     first_document = Document.create! name: "first.txt", folder: uploads_folder

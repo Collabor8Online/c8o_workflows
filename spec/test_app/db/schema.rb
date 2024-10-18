@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_09_204651) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_14_201242) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -164,6 +164,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_204651) do
     t.index ["template_id"], name: "index_workflows_stages_on_template_id"
   end
 
+  create_table "workflows_tasks", force: :cascade do |t|
+    t.integer "template_id"
+    t.string "container_type"
+    t.integer "container_id"
+    t.string "name", default: "", null: false
+    t.datetime "due_on", null: false
+    t.integer "position", default: 1, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["container_type", "container_id"], name: "index_workflows_tasks_on_container"
+    t.index ["template_id"], name: "index_workflows_tasks_on_template_id"
+  end
+
   create_table "workflows_templates", force: :cascade do |t|
     t.integer "category_id"
     t.string "name", default: "", null: false
@@ -187,5 +201,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_204651) do
   add_foreign_key "workflows_options", "workflows_stages", column: "destination_stage_id"
   add_foreign_key "workflows_options", "workflows_stages", column: "stage_id"
   add_foreign_key "workflows_stages", "workflows_templates", column: "template_id"
+  add_foreign_key "workflows_tasks", "workflows_templates", column: "template_id"
   add_foreign_key "workflows_templates", "workflows_categories", column: "category_id"
 end

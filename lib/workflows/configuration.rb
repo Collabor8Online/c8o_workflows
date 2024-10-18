@@ -13,5 +13,7 @@ module Workflows
 
   def self.configuration = @configuration
 
+  def self.reset = @configuration = Configuration.start
+
   @configuration = Configuration.start
 end
