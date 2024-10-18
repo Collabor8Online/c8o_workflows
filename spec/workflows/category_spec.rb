@@ -49,17 +49,83 @@ RSpec.describe Workflows::Category do
   end
 
   describe "#create_template" do
-    it "creates a new template"
-    it "publishes a 'workflows/template_created' event"
+    it "creates a new template" do
+      category.save
+
+      @template = category.create_template name: "My template", default_owner: alice
+
+      expect(@template).to be_persisted
+      expect(@template.name).to eq "My template"
+      expect(@template.default_owner).to eq alice
+      expect(@template.category).to eq category
+    end
+
+    it "publishes a 'workflows/template_created' event" do
+      category.save
+
+      @event = nil
+      @data = nil
+      Workflows.events.add_observer do |event, data|
+        @event = event
+        @data = data[:template]
+      end
+
+      @template = category.create_template name: "My template", default_owner: alice
+
+      expect { @event }.to become "workflows/template_created"
+      expect(@data).to eq @template
+    end
   end
 
   describe "#deactivate_template" do
-    it "marks the template as inactive"
-    it "publishes a 'workflows/template_deactivated' event"
+    it "marks the template as inactive" do
+      @first = Workflows::Template.create! name: "First", category: category, default_owner: alice
+
+      category.deactivate_template @first
+
+      expect(@first.reload).to be_inactive
+    end
+
+    it "publishes a 'workflows/template_deactivated' event" do
+      @first = Workflows::Template.create! name: "First", category: category, default_owner: alice
+
+      @event = nil
+      @data = nil
+      Workflows.events.add_observer do |event, data|
+        @event = event
+        @data = data[:template]
+      end
+
+      category.deactivate_template @first
+
+      expect { @event }.to become "workflows/template_deactivated"
+      expect(@data).to eq @first
+    end
   end
 
   describe "#reactivate_template" do
-    it "marks the template as inactive"
-    it "publishes a 'workflows/template_reactivated' event"
+    it "marks the template as active" do
+      @first = Workflows::Template.create! name: "First", category: category, default_owner: alice, status: "inactive"
+
+      category.reactivate_template @first
+
+      expect(@first.reload).to be_active
+    end
+
+    it "publishes a 'workflows/template_reactivated' event" do
+      @first = Workflows::Template.create! name: "First", category: category, default_owner: alice, status: "inactive"
+
+      @event = nil
+      @data = nil
+      Workflows.events.add_observer do |event, data|
+        @event = event
+        @data = data[:template]
+      end
+
+      category.reactivate_template @first
+
+      expect { @event }.to become "workflows/template_reactivated"
+      expect(@data).to eq @first
+    end
   end
 end
